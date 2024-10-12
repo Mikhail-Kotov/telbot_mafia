@@ -1,0 +1,9 @@
+.config/
+.idea/
+__pycache__/
+build/
+*.lock
+*.py[cod]
+*.bak
+*.log
+.tel.session

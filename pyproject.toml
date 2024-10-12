@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "telbot-mafia"
+version = "0.0.1"
+description = "Это бот для группы MELBOURNE MAFIA CLUB и дальнейшей записи на игру в конкретный день."
+authors = ["mk <mike.kotov@gmail.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12.7"
+pandas = "^2.2.3"
+oauth2client = "^4.1.3"
+Telethon = "^1.37.0"
+python-telegram-bot = "^21.6"
+gspread = "^6.1.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

@@ -3,17 +3,16 @@ from telegram.ext import Application, CommandHandler, ContextTypes, CallbackCont
 import logging
 import pandas as pd
 from telethon import TelegramClient
-import secret_data as secret
 
 import telbot_globals as gl
 import gs
 
-async def get_user_id_by_phone(phone_number):
+async def get_user_id_by_phone(phone_number) -> None:
     async with gl.tel_client:
         user = await gl.tel_client.get_entity(phone_number)
         print(f'ID пользователя: {user.id}')
 
-async def get_user_info(user_id):
+async def get_user_info(user_id) -> str:
     async with gl.tel_client:
         return await gl.tel_client.get_entity(user_id)
 
@@ -43,17 +42,22 @@ async def button(update: Update, context: CallbackContext) -> None:
         # =HYPERLINK("#gid=0&range=A19", users!A19)
         gs.cal_sheet_choosen = gs.google_sheet.worksheet('MEL ' + gl.replace_russian_date(gl.user_answers[t_id][0]))
 
-        new_row = [f'=HYPERLINK("#gid=0&range={gs.uh["ID"]}{tr}", "{st_id}")',
+        new_row = [f'=HYPERLINK("#gid=0&range={gs.uh["ID"]}{tr}", "{st_id}")', # TELID
                    f'=users!{gs.uh["NICKNAME"]}{tr}',
                    f'=users!{gs.uh["FNAME"]}{tr}',
                    f'=users!{gs.uh["LNAME"]}{tr}',
-                   gl.ct(),
-                   gl.replace_russian_words(gl.user_answers[t_id][1]), "комментарий 2"]
+                   gl.ct(), # REGISTERED
+                   gl.ct(), # UPDATED
+                   "Yes",   # COMING
+                   gl.replace_russian_words(gl.user_answers[t_id][1]), "просто комментарий"]
         existing_user_ids = gs.cal_sheet_choosen.col_values(1)
         print(existing_user_ids)
         if st_id not in existing_user_ids:
             print("Строка добавлена", new_row)
             print(gs.cal_sheet_choosen.append_row(new_row, value_input_option="USER_ENTERED"))
+            await query.message.reply_text(str(new_row))
+            await query.message.reply_text("Для дальнейших регистраций на Mafia events снова нажмите /start")
+            await query.message.reply_text("Пака!")
         else:
             print("Первое поле уже существует в таблице")
 
@@ -69,11 +73,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await ask_question(update, 0)
 
 def main() -> None:
-    gl.tel_client = TelegramClient('session_name', int(gl.secret.tel_api_id), gl.secret.tel_api_hash)
+    gl.tel_client = TelegramClient('.tel', int(gl.secret["tel_api_id"]), gl.secret["tel_api_hash"])
     logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
     gl.df_users = pd.DataFrame(gs.users_sheet.get_all_values())
-    application = Application.builder().token(gl.secret.tel_bot_token).build()
+    application = Application.builder().token(gl.secret["tel_bot_token"]).build()
     application.add_handler(CommandHandler(["start"], start))
     application.add_handler(CallbackQueryHandler(button))
     application.run_polling(allowed_updates=Update.ALL_TYPES)
