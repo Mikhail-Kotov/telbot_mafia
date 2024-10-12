@@ -1,8 +1,8 @@
+import json
 import locale
 import re
 import time
 from datetime import date, timedelta
-import secret_data as secret
 
 # current time in string format
 def ct() -> str:
@@ -47,9 +47,14 @@ def replace_russian_words(text):
         text = text.replace(word, replacement)
     return text
 
-#   return date_str
 
 locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+
+# tel_api           through - https://core.telegram.org/api/obtaining_api_id
+# tel_bot_token(s)  through - @BotFather
+secret = json.load(open('.config/telbot_credentials.json', 'r'))
+
+
 # start_date = date(2024, 10, 1)
 # end_date   = date(2024, 11, 1)
 start_date = generate_next_sunday()
