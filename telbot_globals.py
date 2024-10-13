@@ -2,7 +2,9 @@ import json
 import locale
 import re
 import time
+from base64 import b64decode
 from datetime import date, timedelta
+
 
 # current time in string format
 def ct() -> str:
@@ -25,6 +27,9 @@ def generate_next_sunday() -> date:
     if days_until_sunday < 0:
         days_until_sunday += 7
     return today + timedelta(days=days_until_sunday)
+
+def decode(s: str) -> str:
+    return str(b64decode(s), "utf-8")
 
 # функция заменяет "6 октября 2024" в "6/10" отбрасывая год
 def replace_russian_date(date_str: str) -> str:
@@ -53,7 +58,9 @@ locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
 # tel_api           through - https://core.telegram.org/api/obtaining_api_id
 # tel_bot_token(s)  through - @BotFather
 secret = json.load(open('.config/telbot_credentials.json', 'r'))
-
+secret["tel_api_id"], secret["tel_api_hash"] = decode(secret["tel_api_enc"]).split(':')
+secret["tel_bot_token"] = decode(secret["tel_bot_token_enc"])
+secret["tel_mmc_reg_bot_token"] = decode(secret["tel_mmc_reg_bot_token_enc"])
 
 # start_date = date(2024, 10, 1)
 # end_date   = date(2024, 11, 1)
